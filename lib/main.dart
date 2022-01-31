@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:async';
 
 void main() {
@@ -50,24 +51,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  String infoBeacon = '';
+  var points = [
+    {
+      'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
+      'message': 'gire a la derecha',
+      'check': false
+    },
+    {
+      'uid': 'D546DF97-4757-47EF-BE09-3E2DCBDD0C77',
+      'message': 'gire a la derecha por favor',
+      'check': false
+    }
+  ];
+  FlutterTts flutterTts = FlutterTts();
   StreamSubscription<RangingResult>? _streamRanging;
   StreamSubscription<BluetoothState>? _streamBluetooth;
   final _regionBeacons = <Region, List<Beacon>>{};
   final _beacons = <Beacon>[];
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +91,39 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  @override
-  void initState() {
+  Future _speakDescription(description) async {
+    await flutterTts.setVolume(1);
+    await flutterTts.setSpeechRate(0.5);
+    await flutterTts.setPitch(1.0);
+    await flutterTts.setLanguage('es-ES');
+    await flutterTts.awaitSpeakCompletion(true);
+    await flutterTts.speak(description);
+  }
+
+  void _handlerLists(beacons) {
+    try {
+      for (var item in points) {
+        if (item['uid'] == beacons[0].proximityUUID) {
+          print(item['message']);
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _beaconRead() {
+    //beacons con los que trabajaremos
+    final regions = <Region>[
+      Region(
+        identifier: 'iBeacon2.0',
+        proximityUUID: 'D546DF97-4757-47EF-BE09-3E2DCBDD0C77', //+encontrado
+      ),
+      Region(
+        identifier: 'iBeacon2.1',
+        proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
+      ),
+    ];
     void _initBeacon() async {
       try {
         // if you want to manage manual checking about the required permissions
@@ -106,37 +137,32 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     void _requestBeacon() async {
-      await flutterBeacon.requestAuthorization; // es necesario pedir permisos al usuario para poder tener una respuesta!!
+      await flutterBeacon
+          .requestAuthorization; // es necesario pedir permisos al usuario para poder tener una respuesta!!
     }
 
-    _initBeacon();
     _requestBeacon();
-    final regions = <Region>[
-      Region(
-        identifier: 'iBeacon2',
-        proximityUUID: 'd546df97-4757-47ef-be09-3e2dcbdd0c77',
-      ),
-      Region(
-        identifier: 'iBeacon2.1',
-        proximityUUID: 'fda50693-a4e2-4fb1-afcf-c6eb07647825',
-      ),
-    ];
-    //regions.add(Region(identifier: 'com.beacon'));
+    _initBeacon();
 
-    //final _streamRanging = flutterBeacon.ranging(regions).listen((RangingResult result) {
-    // result contains a region and list of beacons found
-    // list can be empty if no matching beacons were found in range
-    //if (mounted) {
-    //print("Lista de beacons: ${result}");
-    //}
-    //});
-
-    _streamRanging =
-        flutterBeacon.ranging(regions).listen((RangingResult result) {
-      print(result);
+    flutterBeacon.ranging(regions).listen((RangingResult result) {
+      //print(result.beacons);
+      _handlerLists(result.beacons);
+      // for (var item in points) {
+      //   if (item['uid'] == result.beacons[0].proximityUUID) {
+      //     print(item['message']);
+      //   }
+      // }
     });
+  }
 
-    //print(_streamRanging);
+  @override
+  void initState() {
+    super.initState(); // inicializa los estados
+    //Funcion periodica que resetea los puntos por si el usuario se queda en un solo punto
+    Timer.periodic(const Duration(seconds: 30), (timer) {
+      print("Reset CHEKK!!");
+    });
+    _beaconRead();
   }
 
   @override
