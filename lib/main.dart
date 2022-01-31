@@ -54,15 +54,17 @@ class _MyHomePageState extends State<MyHomePage> {
   var points = [
     {
       'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
-      'message': 'gire a la derecha',
-      'check': false
+      'message': 'gire a la derecha por favor',
     },
     {
       'uid': 'D546DF97-4757-47EF-BE09-3E2DCBDD0C77',
       'message': 'gire a la derecha por favor',
-      'check': false
     }
   ];
+  Map<String, bool> way = {
+    'FDA50693-A4E2-4FB1-AFCF-C6EB07647825': false,
+    'D546DF97-4757-47EF-BE09-3E2DCBDD0C77': false
+  };
   FlutterTts flutterTts = FlutterTts();
   StreamSubscription<RangingResult>? _streamRanging;
   StreamSubscription<BluetoothState>? _streamBluetooth;
@@ -91,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future _speakDescription(description) async {
+  Future _speakMessage(description) async {
     await flutterTts.setVolume(1);
     await flutterTts.setSpeechRate(0.5);
     await flutterTts.setPitch(1.0);
@@ -104,7 +106,13 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       for (var item in points) {
         if (item['uid'] == beacons[0].proximityUUID) {
-          print(item['message']);
+          print(way[item['uid']]);
+          if (way[item['uid']] == false) {
+            _speakMessage(item['message']);
+            setState(() {
+              way[item['uid'].toString()] = true;
+            });
+          }
         }
       }
     } catch (e) {
