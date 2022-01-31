@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -52,6 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   String infoBeacon = '';
+  StreamSubscription<RangingResult>? _streamRanging;
+  StreamSubscription<BluetoothState>? _streamBluetooth;
   final _regionBeacons = <Region, List<Beacon>>{};
   final _beacons = <Beacon>[];
 
@@ -83,18 +86,13 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(
-
-
-        ),
+        child: Column(),
       ),
-
     );
   }
 
   @override
   void initState() {
-
     void _initBeacon() async {
       try {
         // if you want to manage manual checking about the required permissions
@@ -106,56 +104,43 @@ class _MyHomePageState extends State<MyHomePage> {
         print(e);
       }
     }
+
+    void _requestBeacon() async {
+      await flutterBeacon.requestAuthorization; // es necesario pedir permisos al usuario para poder tener una respuesta!!
+    }
+
     _initBeacon();
+    _requestBeacon();
     final regions = <Region>[
       Region(
-          identifier: 'iBeacon',
-          proximityUUID: 'D31B9844-FD35-4720-AF10-677AA7DC71B5'),
+        identifier: 'iBeacon2',
+        proximityUUID: 'd546df97-4757-47ef-be09-3e2dcbdd0c77',
+      ),
+      Region(
+        identifier: 'iBeacon2.1',
+        proximityUUID: 'fda50693-a4e2-4fb1-afcf-c6eb07647825',
+      ),
     ];
     //regions.add(Region(identifier: 'com.beacon'));
 
-
     //final _streamRanging = flutterBeacon.ranging(regions).listen((RangingResult result) {
-      // result contains a region and list of beacons found
-      // list can be empty if no matching beacons were found in range
-      //if (mounted) {
-        //print("Lista de beacons: ${result}");
-      //}
+    // result contains a region and list of beacons found
+    // list can be empty if no matching beacons were found in range
+    //if (mounted) {
+    //print("Lista de beacons: ${result}");
+    //}
     //});
 
-    final _streamRanging = flutterBeacon.ranging(regions).listen((RangingResult result) {
+    _streamRanging =
+        flutterBeacon.ranging(regions).listen((RangingResult result) {
       print(result);
-      if (mounted) {
-        setState(() {
-          _regionBeacons[result.region] = result.beacons;
-          _beacons.clear();
-          _regionBeacons.values.forEach((list) {
-            _beacons.addAll(list);
-          });
-          _beacons.sort(_compareParameters);
-        });
-      }
-      print('los beacons : ${_beacons}');
     });
 
     //print(_streamRanging);
   }
-  int _compareParameters(Beacon a, Beacon b) {
-    int compare = a.proximityUUID.compareTo(b.proximityUUID);
 
-    if (compare == 0) {
-      compare = a.major.compareTo(b.major);
-    }
-
-    if (compare == 0) {
-      compare = a.minor.compareTo(b.minor);
-    }
-
-    return compare;
-  }
   @override
   void dispose() {
     super.dispose();
-
   }
 }
