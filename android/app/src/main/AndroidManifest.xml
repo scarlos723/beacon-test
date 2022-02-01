@@ -1,8 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.beacon_test">
+    <!-- beacons permisions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-   <application
+    <!-- speach permisions -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+    <application
         android:label="beacon_test"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
