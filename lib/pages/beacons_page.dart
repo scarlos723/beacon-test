@@ -4,13 +4,18 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:async';
 
 class BeaconsPage extends StatefulWidget {
-  const BeaconsPage({Key? key}) : super(key: key);
+  const BeaconsPage({Key? key, required this.product}) : super(key: key);
+  final String product;
 
   @override
   _BeaconsPageState createState() => _BeaconsPageState();
 }
 
 class _BeaconsPageState extends State<BeaconsPage> {
+  Map<String, bool> way = {
+    'FDA50693-A4E2-4FB1-AFCF-C6EB07647825': false,
+    'D546DF97-4757-47EF-BE09-3E2DCBDD0C77': false
+  };
   var points = [
     {
       'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
@@ -21,10 +26,7 @@ class _BeaconsPageState extends State<BeaconsPage> {
       'message': 'gire a la derecha por favor',
     }
   ];
-  Map<String, bool> way = {
-    'FDA50693-A4E2-4FB1-AFCF-C6EB07647825': false,
-    'D546DF97-4757-47EF-BE09-3E2DCBDD0C77': false
-  };
+  String product2 = '';
 
   // StreamSubscription<RangingResult>? _streamRanging;
   // StreamSubscription<BluetoothState>? _streamBluetooth;
@@ -33,6 +35,20 @@ class _BeaconsPageState extends State<BeaconsPage> {
 
   //State TTS
   FlutterTts flutterTts = FlutterTts();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          // Here we take the value from the SpeechPage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: const Text('Beacons'),
+        ),
+        body: Center(
+            // Center is a layout widget. It takes a single child and positions it
+            // in the middle of the parent.
+            child: Text("producto $product2")));
+  }
 
   Future _speakMessage(description) async {
     await flutterTts.setVolume(1);
@@ -107,25 +123,14 @@ class _BeaconsPageState extends State<BeaconsPage> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      product2 = widget.product;
+    });
     _beaconRead();
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          // Here we take the value from the SpeechPage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: const Text('Beacons'),
-        ),
-        body: const Center(
-            // Center is a layout widget. It takes a single child and positions it
-            // in the middle of the parent.
-            child: Text("Sigue el camino")));
   }
 }

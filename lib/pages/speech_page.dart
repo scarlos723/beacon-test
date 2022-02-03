@@ -8,15 +8,6 @@ import 'package:speech_to_text/speech_to_text.dart';
 class SpeechPage extends StatefulWidget {
   const SpeechPage({Key? key, required this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -133,7 +124,8 @@ class _SpeechPageState extends State<SpeechPage> {
   /// This is the callback that the SpeechToText plugin calls when
   /// the platform returns recognized words.
   void _onSpeechResult(SpeechRecognitionResult result) {
-    _speakMessage(result.recognizedWords);
+    _speakMessage(
+        "El producto que mensionaste es: ${result.recognizedWords}. Si ésto es correcto preciona dos veces la pantalla para continuar de lo contrario manten presionado para hablar.");
     setState(() {
       _lastWords = result.recognizedWords;
     });
@@ -155,6 +147,11 @@ class _SpeechPageState extends State<SpeechPage> {
   }
 
   void _showBeaconPage(BuildContext context) {
-    Navigator.pushNamed(context, 'beacons');
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) =>
+                BeaconsPage(product: _lastWords)));
+    // Navigator.pushNamed(context, 'beacons', arguments: _lastWords );
   }
 }
