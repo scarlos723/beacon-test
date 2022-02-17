@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:async';
+import 'dart:convert';
 
 class BeaconsPage extends StatefulWidget {
   const BeaconsPage({Key? key, required this.product}) : super(key: key);
@@ -14,19 +15,24 @@ class BeaconsPage extends StatefulWidget {
 class _BeaconsPageState extends State<BeaconsPage> {
   Map<String, bool> way = {
     'FDA50693-A4E2-4FB1-AFCF-C6EB07647825': false,
-    'D546DF97-4757-47EF-BE09-3E2DCBDD0C77': false
+    'FDA50693-A4E2-4FB1-AFCF-C6EB07646666': false
   };
   var points = [
     {
       'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
-      'message': 'gire a la derecha por favor',
+      'message':
+          'gire a la derecha por favor y camine 20 pasos aproximadamente',
+      'minrssi': -70
     },
     {
-      'uid': 'D546DF97-4757-47EF-BE09-3E2DCBDD0C77',
-      'message': 'gire a la derecha por favor',
+      'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666',
+      'message':
+          'gire a la izquierda por favor y camine 10 pasos aproximadamente',
+      'minrssi': -70
     }
   ];
-  String product2 = '';
+  var infoBeacons = [];
+  String product2 = ''; //value asigned in initState function
 
   // StreamSubscription<RangingResult>? _streamRanging;
   // StreamSubscription<BluetoothState>? _streamBluetooth;
@@ -44,10 +50,24 @@ class _BeaconsPageState extends State<BeaconsPage> {
           // the App.build method, and use it to set our appbar title.
           title: const Text('Beacons'),
         ),
-        body: Center(
-            // Center is a layout widget. It takes a single child and positions it
-            // in the middle of the parent.
-            child: Text("producto $product2")));
+        body: Column(
+          children: <Widget>[
+            Text("producto $product2"),
+            ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: infoBeacons.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: Center(child: Text('Entry ${infoBeacons[index]}')),
+                  );
+                })
+          ],
+          //children: Text("producto $product2")
+        ));
+
+    // Center is a layout widget. It takes a single child and positions it
+    // in the middle of the parent.
   }
 
   Future _speakMessage(description) async {
@@ -62,7 +82,8 @@ class _BeaconsPageState extends State<BeaconsPage> {
   void _handlerLists(beacons) {
     try {
       for (var item in points) {
-        if (item['uid'] == beacons[0].proximityUUID) {
+        if (item['uid'] == beacons[0].proximityUUID &&
+            beacons[0].rssi >= item['minrssi']) {
           print(way[item['uid']]);
           if (way[item['uid']] == false) {
             _speakMessage(item['message']);
@@ -81,12 +102,12 @@ class _BeaconsPageState extends State<BeaconsPage> {
     //beacons con los que trabajaremos
     final regions = <Region>[
       Region(
-        identifier: 'iBeacon2.0',
-        proximityUUID: 'D546DF97-4757-47EF-BE09-3E2DCBDD0C77', //+encontrado
+        identifier: 'iBeacon1',
+        proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
       ),
       Region(
-        identifier: 'iBeacon2.1',
-        proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
+        identifier: 'iBeacon2',
+        proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666', //+encontrado
       ),
     ];
     void _initBeacon() async {
@@ -110,7 +131,10 @@ class _BeaconsPageState extends State<BeaconsPage> {
     _initBeacon();
 
     flutterBeacon.ranging(regions).listen((RangingResult result) {
-      //print(result.beacons);
+      print(result.beacons);
+      setState(() {
+        infoBeacons = result.beacons;
+      });
       _handlerLists(result.beacons);
       // for (var item in points) {
       //   if (item['uid'] == result.beacons[0].proximityUUID) {

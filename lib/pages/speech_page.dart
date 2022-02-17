@@ -124,20 +124,24 @@ class _SpeechPageState extends State<SpeechPage> {
   /// This is the callback that the SpeechToText plugin calls when
   /// the platform returns recognized words.
   void _onSpeechResult(SpeechRecognitionResult result) {
-    _speakMessage(
-        "El producto que mensionaste es: ${result.recognizedWords}. Si ésto es correcto preciona dos veces la pantalla para continuar de lo contrario manten presionado para hablar.");
     setState(() {
       _lastWords = result.recognizedWords;
     });
+    if (result.recognizedWords != '') {
+      _speakMessage('el producto es: ${result.recognizedWords}');
+    }
   }
 
   @override
   void initState() {
     super.initState(); // inicializa los estados
     //Funcion periodica que resetea los puntos por si el usuario se queda en un solo punto
-    Timer.periodic(const Duration(seconds: 30), (timer) {
-      print("Reset CHEKK!!");
-    });
+    // Timer.periodic(const Duration(seconds: 30), (timer) {
+    //   print("Reset CHEKK!!");
+    // });
+
+    _speakMessage(
+        'Hola, ¿qué producto quieres encontrar hoy?. Mantén el dedo sobre la pantalla para hablar');
     _initSpeech();
   }
 
