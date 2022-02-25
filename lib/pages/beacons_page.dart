@@ -14,21 +14,28 @@ class BeaconsPage extends StatefulWidget {
 
 class _BeaconsPageState extends State<BeaconsPage> {
   Map<String, bool> way = {
+    '8961F890-B318-4D51-8130-034444B73E10': false,
     'FDA50693-A4E2-4FB1-AFCF-C6EB07647825': false,
     'FDA50693-A4E2-4FB1-AFCF-C6EB07646666': false
   };
   var points = [
     {
+      'uid': '8961F890-B318-4D51-8130-034444B73E10',
+      'message':
+          'Puedes empezar a caminar, sigue de frente hasta ecuchar la próxima indicación',
+      'minrssi': -60
+    },
+    {
       'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
       'message':
           'gire a la derecha por favor y camine 20 pasos aproximadamente',
-      'minrssi': -70
+      'minrssi': -60
     },
     {
       'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666',
       'message':
           'gire a la izquierda por favor y camine 10 pasos aproximadamente',
-      'minrssi': -70
+      'minrssi': -60
     }
   ];
   var infoBeacons = [];
@@ -79,7 +86,7 @@ class _BeaconsPageState extends State<BeaconsPage> {
     await flutterTts.speak(description);
   }
 
-  void _handlerLists(beacons) {
+  void _compareLists(beacons) {
     try {
       for (var item in points) {
         if (item['uid'] == beacons[0].proximityUUID &&
@@ -99,15 +106,18 @@ class _BeaconsPageState extends State<BeaconsPage> {
   }
 
   void _beaconRead() {
-    //beacons con los que trabajaremos
+    //Region de beacons con los que trabajaremos
     final regions = <Region>[
+      Region(
+          identifier: 'iBeacon', //Start Beacon
+          proximityUUID: '8961F890-B318-4D51-8130-034444B73E10'),
       Region(
         identifier: 'iBeacon1',
         proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
       ),
       Region(
         identifier: 'iBeacon2',
-        proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666', //+encontrado
+        proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666',
       ),
     ];
     void _initBeacon() async {
@@ -124,18 +134,19 @@ class _BeaconsPageState extends State<BeaconsPage> {
 
     void _requestBeacon() async {
       await flutterBeacon
-          .requestAuthorization; // es necesario pedir permisos al usuario para poder tener una respuesta!!
+          .requestAuthorization; // Es necesario pedir permisos al usuario para poder usar los servicios!!
     }
 
     _requestBeacon();
     _initBeacon();
 
+    //Escaneo de beacons
     flutterBeacon.ranging(regions).listen((RangingResult result) {
       print(result.beacons);
       setState(() {
         infoBeacons = result.beacons;
       });
-      _handlerLists(result.beacons);
+      _compareLists(result.beacons);
       // for (var item in points) {
       //   if (item['uid'] == result.beacons[0].proximityUUID) {
       //     print(item['message']);

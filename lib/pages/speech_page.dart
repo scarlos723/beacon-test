@@ -73,21 +73,28 @@ class _SpeechPageState extends State<SpeechPage> {
                 onLongPress: _startListening,
                 onLongPressUp: _stopListening,
                 child: Container(
-                    margin: const EdgeInsets.all(10),
-                    padding: const EdgeInsets.all(10),
-                    width: 300,
-                    height: 300,
-                    color: Colors.red))
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
+                  width: 300,
+                  height: 600,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    color: Colors.grey[900],
+                    boxShadow: const [
+                      BoxShadow(color: Colors.cyan, spreadRadius: 3),
+                    ],
+                  ),
+                ))
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed:
-            // If not yet listening for speech start, otherwise stop
-            _speechToText.isNotListening ? _startListening : _stopListening,
-        tooltip: 'Listen',
-        child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
-      ),
+      // floatingActionButton: FloatingActionButton( //button floating
+      //   onPressed:
+      //       // If not yet listening for speech start, otherwise stop
+      //       _speechToText.isNotListening ? _startListening : _stopListening,
+      //   tooltip: 'Listen',
+      //   child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
+      // ),
     );
   }
 
@@ -128,7 +135,8 @@ class _SpeechPageState extends State<SpeechPage> {
       _lastWords = result.recognizedWords;
     });
     if (result.recognizedWords != '') {
-      _speakMessage('el producto es: ${result.recognizedWords}');
+      _speakMessage(
+          'el producto es: ${result.recognizedWords}. Si es correcto, toca dos veces sobre la pantalla para continuar. Si no es así maten presionado nuevamente para hablar');
     }
   }
 
