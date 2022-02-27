@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:async';
+import 'package:beacon_test/pages/nfc_page.dart';
 import 'dart:convert';
 
 class BeaconsPage extends StatefulWidget {
@@ -147,11 +148,10 @@ class _BeaconsPageState extends State<BeaconsPage> {
         infoBeacons = result.beacons;
       });
       _compareLists(result.beacons);
-      // for (var item in points) {
-      //   if (item['uid'] == result.beacons[0].proximityUUID) {
-      //     print(item['message']);
-      //   }
-      // }
+      if (way['FDA50693-A4E2-4FB1-AFCF-C6EB07646666'] == true) {
+        _showNfcPage(context);
+        return;
+      }
     });
   }
 
@@ -167,5 +167,11 @@ class _BeaconsPageState extends State<BeaconsPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _showNfcPage(BuildContext context) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (BuildContext context) => const NfcPage()));
+    // Navigator.pushNamed(context, 'beacons', arguments: _lastWords );
   }
 }

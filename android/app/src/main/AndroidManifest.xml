@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.beacon_test">
+    <uses-permission android:name="android.permission.BIND_NFC_SERVICE"/>
+    <uses-permission android:name="android.permission.NFC"/>
     <!-- beacons permisions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- speach permisions -->
