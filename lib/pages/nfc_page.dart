@@ -78,8 +78,14 @@ class _NfcPageState extends State<NfcPage> {
                         margin: const EdgeInsets.all(10),
                         padding: const EdgeInsets.all(10),
                         width: 300,
-                        height: 300,
-                        color: Colors.red,
+                        height: 600,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.lightGreen[50],
+                          boxShadow: const [
+                            BoxShadow(color: Colors.green, spreadRadius: 3),
+                          ],
+                        ),
                         child: Center(child: Text(producto["name"])),
                       ))
                 ],

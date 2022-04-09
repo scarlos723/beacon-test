@@ -14,6 +14,7 @@ class BeaconsPage extends StatefulWidget {
 }
 
 class _BeaconsPageState extends State<BeaconsPage> {
+  StreamSubscription<RangingResult>? _streamRanging;
   Map<String, bool> way = {
     '8961F890-B318-4D51-8130-034444B73E10': false,
     'FDA50693-A4E2-4FB1-AFCF-C6EB07647825': false,
@@ -29,19 +30,39 @@ class _BeaconsPageState extends State<BeaconsPage> {
     {
       'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
       'message':
-          'gire a la derecha por favor y camine 20 pasos aproximadamente',
+          'Excelente trabajo. Ahora gira a la derecha y camina 20 pasos aproximadamente',
       'minrssi': -60
     },
     {
       'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666',
       'message':
-          'gire a la izquierda por favor y camine 10 pasos aproximadamente',
+          'Excelente falta poco. gira a la izquierda y camina 10 pasos aproximadamente',
       'minrssi': -60
-    }
+    },
+    {
+      'uid': 'C36622DF-A25F-4EE3-A5FE-02C77933BA31', //ultimo beacon
+      'message':
+      'Llegamos. A tu izquierda se encuentra el pasillo donde encontraras tu producto. A mano derecha del pasillo hay diferentes productos. Para tener mas información sobre los productos puedes acercar el celular sus etiqueta',
+      'minrssi': -60
+    },
+
   ];
   var infoBeacons = [];
   String product2 = ''; //value asigned in initState function
-
+  //Region de beacons con los que trabajaremos
+  final regions = <Region>[
+    Region(
+        identifier: 'iBeacon', //Start Beacon
+        proximityUUID: '8961F890-B318-4D51-8130-034444B73E10'),
+    Region(
+      identifier: 'iBeacon1',
+      proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
+    ),
+    Region(
+      identifier: 'iBeacon2',
+      proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666',
+    ),
+  ];
   // StreamSubscription<RangingResult>? _streamRanging;
   // StreamSubscription<BluetoothState>? _streamBluetooth;
   // final _regionBeacons = <Region, List<Beacon>>{};
@@ -106,53 +127,35 @@ class _BeaconsPageState extends State<BeaconsPage> {
     }
   }
 
-  void _beaconRead() {
-    //Region de beacons con los que trabajaremos
-    final regions = <Region>[
-      Region(
-          identifier: 'iBeacon', //Start Beacon
-          proximityUUID: '8961F890-B318-4D51-8130-034444B73E10'),
-      Region(
-        identifier: 'iBeacon1',
-        proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
-      ),
-      Region(
-        identifier: 'iBeacon2',
-        proximityUUID: 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666',
-      ),
-    ];
-    void _initBeacon() async {
-      try {
-        // if you want to manage manual checking about the required permissions
-        await flutterBeacon.initializeScanning;
-        // or if you want to include automatic checking permission
-        //await flutterBeacon.initializeAndCheckScanning;
-      } on FormatException catch (e) {
-        // library failed to initialize, check code and message
-        print(e);
-      }
-    }
-
-    void _requestBeacon() async {
+  void _initBeacon() async {
+    try {
+      // if you want to manage manual checking about the required permissions
+      await flutterBeacon.initializeScanning;
       await flutterBeacon
-          .requestAuthorization; // Es necesario pedir permisos al usuario para poder usar los servicios!!
+          .requestAuthorization; // Pedir permisos al usuario para poder usar los servicios!!
+      // or if you want to include automatic checking permission
+      //await flutterBeacon.initializeAndCheckScanning;
+    } on FormatException catch (e) {
+      // library failed to initialize, check code and message
+      print(e);
     }
-
-    _requestBeacon();
-    _initBeacon();
-
     //Escaneo de beacons
-    flutterBeacon.ranging(regions).listen((RangingResult result) {
+    _streamRanging =
+        flutterBeacon.ranging(regions).listen((RangingResult result) {
       print(result.beacons);
       setState(() {
         infoBeacons = result.beacons;
       });
       _compareLists(result.beacons);
       if (way['FDA50693-A4E2-4FB1-AFCF-C6EB07646666'] == true) {
-        _showNfcPage(context);
-        return;
+        _endScan();
       }
     });
+  }
+
+  void _endScan() {
+    _streamRanging?.cancel();
+    _showNfcPage(context);
   }
 
   @override
@@ -161,7 +164,7 @@ class _BeaconsPageState extends State<BeaconsPage> {
     setState(() {
       product2 = widget.product;
     });
-    _beaconRead();
+    _initBeacon();
   }
 
   @override

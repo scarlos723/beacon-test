@@ -61,7 +61,7 @@ class _SpeechPageState extends State<SpeechPage> {
                       // recognition is not yet ready or not supported on
                       // the target device
                       : _speechEnabled
-                          ? 'Tap the microphone to start listening...'
+                          ? 'Mantener presionado para hablar...'
                           : 'Speech not available',
                 ),
               ),
@@ -149,7 +149,7 @@ class _SpeechPageState extends State<SpeechPage> {
     // });
 
     _speakMessage(
-        'Hola, ¿qué producto quieres encontrar hoy?. Mantén el dedo sobre la pantalla para hablar');
+        'Hola Consuelo, bienvenida. Eres muy buena encontrando broductos y es una habilidad que pocos poseen, así que vamos en busca de algunos se ellos. ¿Qué producto quieres encontrar hoy?. Mantén el dedo sobre la pantalla para hablar');
     _initSpeech();
   }
 
