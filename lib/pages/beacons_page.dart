@@ -3,12 +3,34 @@ import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:async';
 import 'package:beacon_test/pages/nfc_page.dart';
-import 'dart:convert';
+//import 'dart:convert';
 
 class BeaconsPage extends StatefulWidget {
-  const BeaconsPage({Key? key, required this.product}) : super(key: key);
-  final String product;
+  const BeaconsPage(
+      {Key? key,
+      required this.product,
+      required this.rateSpeech,
+      required this.gamify,
+      required this.dir7825,
+      required this.pasos7825,
+      required this.dir6666,
+      required this.pasillo6666,
+      required this.dirBA31,
+      required this.pasosBA31})
+      : super(key: key);
 
+  final String product;
+  final String rateSpeech;
+  final bool gamify;
+
+  final String dir7825;
+  final String pasos7825;
+
+  final String dir6666;
+  final String pasillo6666;
+
+  final String dirBA31;
+  final String pasosBA31;
   @override
   _BeaconsPageState createState() => _BeaconsPageState();
 }
@@ -20,32 +42,40 @@ class _BeaconsPageState extends State<BeaconsPage> {
     'FDA50693-A4E2-4FB1-AFCF-C6EB07647825': false,
     'FDA50693-A4E2-4FB1-AFCF-C6EB07646666': false
   };
+
   var points = [
     {
       'uid': '8961F890-B318-4D51-8130-034444B73E10',
       'message':
           'Puedes empezar a caminar, sigue de frente hasta ecuchar la próxima indicación',
+      'messageGamify':
+          'Puedes empezar a caminar, 6 pasos aproximadamente hasta la próxima indicación',
       'minrssi': -60
     },
     {
       'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
       'message':
-          'Excelente trabajo. Ahora gira a la derecha y camina 20 pasos aproximadamente',
+          'Gira a la izquierda y camina en forma recta hasta escuchar la proxima indicacion',
+      'messageGamify':
+          'Excelente, gira a la izquierda y camina 16 pasos aproximadamente hasta escuchar la proxima indicacion',
       'minrssi': -60
     },
     {
       'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666',
       'message':
-          'Excelente falta poco. gira a la izquierda y camina 10 pasos aproximadamente',
+          'Gira a tu derecha para ingrezar al pasillo. A mano izquierda del pasillo se encuentra el producto. Puedes acercar el teléfono a los productos para identificarlos',
+      'messageGamify':
+          'Llegamos. A tu derecha se encuentra el pasillo donde encontraras tu producto. A mano izquierda del pasillo hay diferentes productos. Para tener mas información sobre los productos puedes acercar el celular sus etiqueta',
       'minrssi': -60
     },
     {
       'uid': 'C36622DF-A25F-4EE3-A5FE-02C77933BA31', //ultimo beacon
       'message':
-      'Llegamos. A tu izquierda se encuentra el pasillo donde encontraras tu producto. A mano derecha del pasillo hay diferentes productos. Para tener mas información sobre los productos puedes acercar el celular sus etiqueta',
+          'Gira a tu derecha para ingrezar al pasillo. A mano izquierda del pasillo se encuentra el producto. Puedes acercar el teléfono a los productos para identificarlos',
+      'messageGamify':
+          "Buen trabajo, gira a la y camina 22 pasos aproximadamente hasta escuchar la proxima indicacion",
       'minrssi': -60
     },
-
   ];
   var infoBeacons = [];
   String product2 = ''; //value asigned in initState function
@@ -101,7 +131,8 @@ class _BeaconsPageState extends State<BeaconsPage> {
 
   Future _speakMessage(description) async {
     await flutterTts.setVolume(1);
-    await flutterTts.setSpeechRate(0.5);
+    var rate = double.parse(widget.rateSpeech);
+    await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(1.0);
     await flutterTts.setLanguage('es-ES');
     await flutterTts.awaitSpeakCompletion(true);
@@ -109,13 +140,52 @@ class _BeaconsPageState extends State<BeaconsPage> {
   }
 
   void _compareLists(beacons) {
+    var points2 = [
+      {
+        'uid': '8961F890-B318-4D51-8130-034444B73E10',
+        'message':
+            'Puedes empezar a caminar, sigue de frente hasta escuchar la próxima indicación',
+        'messageGamify':
+            'Recuerda que cada producto encontrado te sumará experiencia que podrás cambiar por premios y descuentos. Ya puedes empezar a caminar, sigue de frente hasta escuchar la próxima indicación',
+        'minrssi': -60
+      },
+      {
+        'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825',
+        'message':
+            'Gira a la ${widget.dir7825} y camina en forma recta hasta escuchar la proxima indicacion',
+        'messageGamify':
+            'Excelente, gira a la ${widget.dir7825} y camina ${widget.pasos7825} pasos aproximadamente hasta escuchar la proxima indicacion',
+        'minrssi': -60
+      },
+      {
+        'uid': 'FDA50693-A4E2-4FB1-AFCF-C6EB07646666', //ultimo beacon
+        'message':
+            'Gira a tu ${widget.dir6666} para ingrezar al pasillo. A mano ${widget.pasillo6666} del pasillo se encuentra el producto. Puedes acercar el teléfono a las etiquetas en braile de los productos para identificarlos',
+        'messageGamify':
+            'Llegamos. A tu ${widget.dir6666} se encuentra el pasillo donde encontrarás tu producto. A mano ${widget.pasillo6666} del pasillo hay diferentes productos. Para tener mas información sobre los productos puedes acercar el celular a las etiquetas en braile',
+        'minrssi': -60
+      },
+      {
+        'uid': 'C36622DF-A25F-4EE3-A5FE-02C77933BA31',
+        'message':
+            'Gira a tu ${widget.dirBA31} y camina ${widget.pasosBA31} hasta escuchar la proxima indicacion ',
+        'messageGamify':
+            "Buen trabajo, gira a la ${widget.dirBA31} y camina ${widget.pasosBA31} pasos aproximadamente hasta escuchar la proxima indicacion",
+        'minrssi': -60
+      },
+    ];
     try {
-      for (var item in points) {
+      for (var item in points2) {
         if (item['uid'] == beacons[0].proximityUUID &&
             beacons[0].rssi >= item['minrssi']) {
           print(way[item['uid']]);
           if (way[item['uid']] == false) {
-            _speakMessage(item['message']);
+            if (widget.gamify) {
+              _speakMessage(item['messageGamify']);
+            } else {
+              _speakMessage(item['message']);
+            }
+
             setState(() {
               way[item['uid'].toString()] = true;
             });
@@ -173,8 +243,11 @@ class _BeaconsPageState extends State<BeaconsPage> {
   }
 
   void _showNfcPage(BuildContext context) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (BuildContext context) => const NfcPage()));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) =>
+                NfcPage(rateSpeech: widget.rateSpeech, gamify: widget.gamify)));
     // Navigator.pushNamed(context, 'beacons', arguments: _lastWords );
   }
 }

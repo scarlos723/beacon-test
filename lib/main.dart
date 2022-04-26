@@ -1,5 +1,4 @@
-import 'package:beacon_test/pages/beacons_page.dart';
-import 'package:beacon_test/pages/speech_page.dart';
+import 'package:beacon_test/pages/configurations.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -26,7 +25,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.cyan,
       ),
-      home: const SpeechPage(title: 'Flutter Demo Home Page'),
+      home: const ConfigurationPage(title: 'Configurations'),
       // initialRoute: '/',
       // routes: <String, WidgetBuilder>{
       //   '/': (BuildContext context) => const SpeechPage(

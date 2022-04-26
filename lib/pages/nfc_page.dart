@@ -3,8 +3,11 @@ import 'package:nfc_manager/nfc_manager.dart';
 import 'package:flutter/material.dart';
 
 class NfcPage extends StatefulWidget {
-  const NfcPage({Key? key}) : super(key: key);
+  const NfcPage({Key? key, required this.rateSpeech, required this.gamify})
+      : super(key: key);
 
+  final String rateSpeech;
+  final bool gamify;
   @override
   State<NfcPage> createState() => _NfcPageState();
 }
@@ -17,17 +20,27 @@ class _NfcPageState extends State<NfcPage> {
   List tagIds = [
     {
       "id": 1,
-      "name": "Café Colombia",
+      "name": "Café Alcazar. 500 gramos. Tipo Organico. Valor 6000 Pesos. "
+          "Mantén el dedo sobre la pantalla para saber la fecha de vencimiento. "
+          "Si quieres comprarlo toca dos veces la pantalla",
       "tagId": [4, 245, 119, 58, 20, 111, 128],
-      "description":
-          "Valor 3500 Pesos. 500 gramos de contenido, este producto vence el 20 de Marzo del 2022"
+      "description": "Este producto vence el 20 de Septiembre del 2022"
     },
     {
       "id": 2,
-      "name": "Chocolate",
-      "tagId": [62, 245, 28, 228],
-      "description":
-          "Valor 2000 Pesos. 500 gramos de contenido, este producto vence el 20 de Enero del 2022"
+      "name": "Chocolate Corona. 180 Gramos. No es Organico. Valor 2000 Pesos. "
+          "Mantén el dedo sobre la pantalla para saber la fecha de vencimiento. "
+          "Si quieres comprarlo toca dos veces la pantalla",
+      "tagId": [4, 1, 119, 58, 20, 111, 129],
+      "description": "Este producto vence el 20 de Junio del 2022"
+    },
+    {
+      "id": 3,
+      "name": "Cafe Minca. 280 Gramos. Tipo Organico. Valor 700 Pesos. "
+          "Mantén el dedo sobre la pantalla para saber la fecha de vencimiento. "
+          "Si quieres comprarlo toca dos veces la pantalla",
+      "tagId": [4, 253, 119, 58, 20, 111, 128],
+      "description": "Este producto vence el 12 de Diciembre del 2022"
     }
   ];
   @override
@@ -41,7 +54,6 @@ class _NfcPageState extends State<NfcPage> {
               return const Text("Esperando Data");
             } else {
               return Flex(
-                /* mainAxisAlignment: MainAxisAlignment.spaceBetween, */
                 direction: Axis.vertical,
                 children: [
                   Flexible(
@@ -53,25 +65,11 @@ class _NfcPageState extends State<NfcPage> {
                       ),
                     ),
                   ),
-                  /* Flexible(
-                        flex: 1,
-                        child: GridView.count(
-                          padding: EdgeInsets.all(4),
-                          crossAxisCount: 2,
-                          childAspectRatio: 4,
-                          crossAxisSpacing: 4,
-                          mainAxisSpacing: 4,
-                          children: [
-                            Text(producto),
-                            /* ElevatedButton(
-                                child: Text('Tag Read'), onPressed: _tagRead), */
-
-                          ],
-                        ),
-                      ), */
-
                   GestureDetector(
                       onDoubleTap: () {
+                        _productSelected();
+                      },
+                      onLongPress: () {
                         _speakDescription(producto["description"]);
                       },
                       child: Container(
@@ -95,9 +93,26 @@ class _NfcPageState extends State<NfcPage> {
         ));
   }
 
+  Future _productSelected() async {
+    await flutterTts.setVolume(1);
+    var rate = double.parse(widget.rateSpeech);
+    await flutterTts.setSpeechRate(rate);
+    await flutterTts.setPitch(1.0);
+    await flutterTts.setLanguage('es-ES');
+    await flutterTts.awaitSpeakCompletion(true);
+    if (widget.gamify) {
+      await flutterTts.speak(
+          "Producto agregado. Excelente trabajo, tu experiencia incrementó 200 puntos, ahora eres un buscador avanzado. Entre mas experiencia, mas beneficios tendras.");
+    } else {
+      await flutterTts.speak(
+          "Producto agregado. Excelente trabajo, econtraste el producto que querías");
+    }
+  }
+
   Future _speak(name) async {
     await flutterTts.setVolume(1);
-    await flutterTts.setSpeechRate(0.5);
+    var rate = double.parse(widget.rateSpeech);
+    await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(1.0);
     await flutterTts.setLanguage('es-ES');
     await flutterTts.awaitSpeakCompletion(true);
@@ -106,7 +121,8 @@ class _NfcPageState extends State<NfcPage> {
 
   Future _speakDescription(description) async {
     await flutterTts.setVolume(1);
-    await flutterTts.setSpeechRate(0.5);
+    var rate = double.parse(widget.rateSpeech);
+    await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(1.0);
     await flutterTts.setLanguage('es-ES');
     await flutterTts.awaitSpeakCompletion(true);
@@ -150,15 +166,6 @@ class _NfcPageState extends State<NfcPage> {
         print("No entro");
       }
     }
-/*  if(areListsEqual(item["tagId"], [4, 245, 119, 58, 20, 111, 128]) ){
-      setState(() {
-        producto["name"]="Cafe";
-      });
-      _speak();
-      print ("Entro al  If");
-    }else{
-      print ("No entro");
-    } */
   }
 
   void _tagRead() {
@@ -166,7 +173,7 @@ class _NfcPageState extends State<NfcPage> {
       result.value = tag.data;
       _setId(result.value['nfca'][
           'identifier']); // Se ejecuta la funcion _setId quien procesa el identificador del tag
-      //NfcManager.instance.stopSession();  // When is uncoment, the app stop the session and init the session by default from NFC phone
+      //NfcManager.instance.stopSession();  // Cuando esta descomentado la aplciacion se detiene y usa la aplicacion de scaneo de bfc por default del sistema del telefono
     });
   }
 

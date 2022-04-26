@@ -6,9 +6,33 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class SpeechPage extends StatefulWidget {
-  const SpeechPage({Key? key, required this.title}) : super(key: key);
+  const SpeechPage(
+      {Key? key,
+      required this.title,
+      required this.gamify,
+      required this.nombre,
+      required this.rateSpeech,
+      required this.dir7825,
+      required this.pasos7825,
+      required this.dir6666,
+      required this.pasillo6666,
+      required this.dirBA31,
+      required this.pasosBA31})
+      : super(key: key);
 
   final String title;
+  final bool gamify;
+  final String nombre;
+  final String rateSpeech;
+
+  final String dir7825;
+  final String pasos7825;
+
+  final String dir6666;
+  final String pasillo6666;
+
+  final String dirBA31;
+  final String pasosBA31;
 
   @override
   State<SpeechPage> createState() => _SpeechPageState();
@@ -19,6 +43,7 @@ class _SpeechPageState extends State<SpeechPage> {
   final SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
+
   // TTS
   FlutterTts flutterTts = FlutterTts();
 
@@ -100,7 +125,9 @@ class _SpeechPageState extends State<SpeechPage> {
 
   Future _speakMessage(description) async {
     await flutterTts.setVolume(1);
-    await flutterTts.setSpeechRate(0.5);
+    // await flutterTts.setSpeechRate(0.5);
+    var rate = double.parse(widget.rateSpeech);
+    await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(1.0);
     await flutterTts.setLanguage('es-ES');
     await flutterTts.awaitSpeakCompletion(true);
@@ -136,7 +163,7 @@ class _SpeechPageState extends State<SpeechPage> {
     });
     if (result.recognizedWords != '') {
       _speakMessage(
-          'el producto es: ${result.recognizedWords}. Si es correcto, toca dos veces sobre la pantalla para continuar. Si no es así maten presionado nuevamente para hablar');
+          'el producto es: ${result.recognizedWords}. Si es correcto, toca dos veces sobre la pantalla para continuar. Si no es así Mantén presionado nuevamente para hablar');
     }
   }
 
@@ -147,9 +174,13 @@ class _SpeechPageState extends State<SpeechPage> {
     // Timer.periodic(const Duration(seconds: 30), (timer) {
     //   print("Reset CHEKK!!");
     // });
-
-    _speakMessage(
-        'Hola Consuelo, bienvenida. Eres muy buena encontrando broductos y es una habilidad que pocos poseen, así que vamos en busca de algunos se ellos. ¿Qué producto quieres encontrar hoy?. Mantén el dedo sobre la pantalla para hablar');
+    if (widget.gamify) {
+      _speakMessage(
+          'Hola ${widget.nombre}. Eres Excelente encontrando broductos y es una habilidad que pocos poseen, así que vamos en busca de algunos se ellos. ¿Qué producto quieres encontrar hoy?. Mantén el dedo sobre la pantalla para hablar');
+    } else {
+      _speakMessage(
+          "Hola. ¿Qué producto quieres encontrar hoy?. Mantén el dedo sobre la pantalla para hablar");
+    }
     _initSpeech();
   }
 
@@ -162,8 +193,16 @@ class _SpeechPageState extends State<SpeechPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) =>
-                BeaconsPage(product: _lastWords)));
+            builder: (BuildContext context) => BeaconsPage(
+                product: _lastWords,
+                rateSpeech: widget.rateSpeech,
+                gamify: widget.gamify,
+                dir7825: widget.dir7825,
+                pasos7825: widget.pasos7825,
+                dir6666: widget.dir6666,
+                pasillo6666: widget.pasillo6666,
+                dirBA31: widget.dirBA31,
+                pasosBA31: widget.pasosBA31)));
     // Navigator.pushNamed(context, 'beacons', arguments: _lastWords );
   }
 }
